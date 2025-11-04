@@ -153,13 +153,28 @@ const PuzzleGame = () => {
         body: JSON.stringify({ userAddress: walletAddress, score }),
       });
 
-      const responseData = await response.json();
+      // Check if response has content
+      const text = await response.text();
+      if (!text) {
+        throw new Error('Empty response from server. Check Cloudflare Pages Functions configuration.');
+      }
+
+      let responseData;
+      try {
+        responseData = JSON.parse(text);
+      } catch (parseError) {
+        throw new Error(`Invalid JSON response: ${text.substring(0, 100)}`);
+      }
 
       if (!response.ok) {
         throw new Error(responseData.error || 'Failed to get signature from backend.');
       }
 
       const { databytes, v, r, s, rewardTokenSymbol, rewardTokenAmount } = responseData;
+
+      if (!databytes || v === undefined || !r || !s) {
+        throw new Error('Invalid signature data from backend.');
+      }
 
       setClaimResult({ rewardTokenSymbol, rewardTokenAmount });
 
@@ -171,6 +186,7 @@ const PuzzleGame = () => {
       });
 
     } catch (error) {
+      console.error('Claim error:', error);
       setClaimError(error instanceof Error ? error.message : 'An unknown error occurred.');
     }
   };

@@ -19,14 +19,35 @@ const ERC1155_ABI = [
 ];
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
+  // Add CORS headers
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
+
+  // Handle OPTIONS request
+  if (context.request.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: corsHeaders });
+  }
+
   try {
-    const body: RequestBody = await context.request.json();
+    let body: RequestBody;
+    try {
+      body = await context.request.json();
+    } catch (parseError) {
+      return Response.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400, headers: corsHeaders }
+      );
+    }
+
     const { userAddress, score } = body;
 
     if (!userAddress || typeof score !== "number") {
       return Response.json(
         { error: "Missing or invalid userAddress or score" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -38,16 +59,22 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     } = context.env;
 
     if (!SIGNER_PRIVATE_KEY || !WCT_TOKEN_ADDRESS || !DEGEN_TOKEN_ADDRESS || !BASE_RPC_URL) {
+      console.error("Missing env vars:", {
+        hasSigner: !!SIGNER_PRIVATE_KEY,
+        hasWCT: !!WCT_TOKEN_ADDRESS,
+        hasDEGEN: !!DEGEN_TOKEN_ADDRESS,
+        hasRPC: !!BASE_RPC_URL,
+      });
       return Response.json(
-        { error: "Backend environment not configured correctly" },
-        { status: 500 }
+        { error: "Backend environment not configured correctly. Check Cloudflare Pages environment variables." },
+        { status: 500, headers: corsHeaders }
       );
     }
 
     if (score <= 0) {
       return Response.json(
         { error: "Score must be greater than 0 to claim" },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -59,7 +86,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     if (balance <= 0n) {
       return Response.json(
         { error: "You need to mint Zero Quest Pass to play & claim" },
-        { status: 403 }
+        { status: 403, headers: corsHeaders }
       );
     }
 
@@ -106,9 +133,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       rewardTokenAddress,
     };
 
-    return Response.json(responsePayload);
+    return Response.json(responsePayload, { headers: corsHeaders });
   } catch (error: any) {
     console.error("Claim Error:", error);
-    return Response.json({ error: error.message }, { status: 500 });
+    const errorMessage = error?.message || error?.toString() || 'Unknown error occurred';
+    return Response.json(
+      { error: errorMessage },
+      { status: 500, headers: corsHeaders }
+    );
   }
 };

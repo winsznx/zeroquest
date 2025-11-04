@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:pages": "wrangler pages dev dist --compatibility-date=2024-01-01",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
