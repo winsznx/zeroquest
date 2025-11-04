@@ -50,3 +50,5 @@ typechain-types/
 # Misc
 .cache
 .turbo
+functions/node_modules
+functions/package-lock.json
