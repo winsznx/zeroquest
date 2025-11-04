@@ -1,0 +1,43 @@
+.app-container {
+  min-height: 100vh;
+  width: 100%;
+}
+
+.puzzle-grid {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.puzzle-tile {
+  aspect-ratio: 1;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.puzzle-tile:hover:not(.locked) {
+  transform: scale(1.05);
+}
+
+.puzzle-tile.correct {
+  background: linear-gradient(135deg, #10b981, #059669);
+  animation: pulse 0.5s ease;
+}
+
+.puzzle-tile.incorrect {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  animation: shake 0.5s ease;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
