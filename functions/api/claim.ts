@@ -79,24 +79,44 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     // Verify user owns Zero Quest Pass NFT
+    let balance = 0n;
     try {
       if (!BASE_RPC_URL) {
         throw new Error("BASE_RPC_URL not configured");
       }
       
-      const provider = new ethers.JsonRpcProvider(BASE_RPC_URL, undefined, {
-        staticNetwork: true,
+      // Create provider with explicit fetch (Cloudflare Workers compatible)
+      const provider = new ethers.JsonRpcProvider(BASE_RPC_URL);
+      
+      // Use direct RPC call for better compatibility
+      const iface = new ethers.Interface(ERC1155_ABI);
+      const data = iface.encodeFunctionData("balanceOf", [userAddress, 1]);
+      
+      const rpcResponse = await fetch(BASE_RPC_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          method: "eth_call",
+          params: [{
+            to: NFT_CONTRACT,
+            data: data
+          }, "latest"],
+          id: 1
+        })
       });
       
-      const nft = new ethers.Contract(NFT_CONTRACT, ERC1155_ABI, provider);
+      const rpcResult = await rpcResponse.json();
       
-      // Add timeout and better error handling
-      const balance = await Promise.race([
-        nft.balanceOf(userAddress, 1),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error("NFT balance check timeout")), 10000)
-        )
-      ]) as bigint;
+      if (rpcResult.error) {
+        throw new Error(`RPC error: ${rpcResult.error.message || rpcResult.error}`);
+      }
+      
+      if (!rpcResult.result || rpcResult.result === "0x") {
+        balance = 0n;
+      } else {
+        balance = BigInt(rpcResult.result);
+      }
 
       if (balance <= 0n) {
         return Response.json(
@@ -107,8 +127,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     } catch (nftError: any) {
       console.error("NFT balance check error:", nftError);
       const errorMessage = nftError?.message || nftError?.toString() || 'Unknown error';
+      
       return Response.json(
-        { error: `Failed to verify NFT ownership: ${errorMessage}. Check BASE_RPC_URL and contract address.` },
+        { error: `Failed to verify NFT ownership: ${errorMessage}. Check BASE_RPC_URL (${BASE_RPC_URL ? 'set' : 'missing'})` },
         { status: 500, headers: corsHeaders }
       );
     }
