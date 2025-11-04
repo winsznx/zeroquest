@@ -79,14 +79,37 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     // Verify user owns Zero Quest Pass NFT
-    const provider = new ethers.JsonRpcProvider(BASE_RPC_URL);
-    const nft = new ethers.Contract(NFT_CONTRACT, ERC1155_ABI, provider);
-    const balance = await nft.balanceOf(userAddress, 1);
+    try {
+      if (!BASE_RPC_URL) {
+        throw new Error("BASE_RPC_URL not configured");
+      }
+      
+      const provider = new ethers.JsonRpcProvider(BASE_RPC_URL, undefined, {
+        staticNetwork: true,
+      });
+      
+      const nft = new ethers.Contract(NFT_CONTRACT, ERC1155_ABI, provider);
+      
+      // Add timeout and better error handling
+      const balance = await Promise.race([
+        nft.balanceOf(userAddress, 1),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error("NFT balance check timeout")), 10000)
+        )
+      ]) as bigint;
 
-    if (balance <= 0n) {
+      if (balance <= 0n) {
+        return Response.json(
+          { error: "You need to mint Zero Quest Pass to play & claim" },
+          { status: 403, headers: corsHeaders }
+        );
+      }
+    } catch (nftError: any) {
+      console.error("NFT balance check error:", nftError);
+      const errorMessage = nftError?.message || nftError?.toString() || 'Unknown error';
       return Response.json(
-        { error: "You need to mint Zero Quest Pass to play & claim" },
-        { status: 403, headers: corsHeaders }
+        { error: `Failed to verify NFT ownership: ${errorMessage}. Check BASE_RPC_URL and contract address.` },
+        { status: 500, headers: corsHeaders }
       );
     }
 
