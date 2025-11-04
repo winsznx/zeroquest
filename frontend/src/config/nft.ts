@@ -1,6 +1,6 @@
 // NFT Contract Configuration - Zero Quest Pass
 
-export const nftContractAddress = '0x19A6B9654b463c79FAf2c474d539611b474b7e4e';
+export const nftContractAddress = '0x656bc95b9E2f713184129629C1c3dFbeB67aCc59';
 
 export const nftAbi = [
   {

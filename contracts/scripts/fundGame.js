@@ -5,11 +5,11 @@ async function main() {
   const [deployer] = await hre.ethers.getSigners();
   console.log("Funding ZQGame contract with:", deployer.address);
 
-  // Contract addresses
-  const ZQGameAddress = "0xAAc3cDa25F27D94394C7127347C7486d288aB078";
-  const ZQTokenAddress = "0x1Cc1A2C1c39cf25316ABb3B8E86F4fA718313ea0";
-  const WCTokenAddress = "0x74fC3E8C57229A1D4364e1Af1A5155f8eA6EB164";
-  const DegenTokenAddress = "0x060adE085F2441dbE6d57948EAd597a24a7A418d";
+  // Contract addresses (from deployment-addresses.json)
+  const ZQGameAddress = "0x1d882c29032Be317b49dF00eDbed3a6C4ae25B43";
+  const ZQTokenAddress = "0xAD45C8bd122757B36c24ee273837d97c04E2A96C";
+  const WCTokenAddress = "0xb149C3f586098aa78d892FBEeF5361c8296B5697";
+  const DegenTokenAddress = "0x22E7AA46aDDF743c99322212852dB2FA17b404b2";
 
   // Amounts to send (in tokens, will be converted to wei)
   const amounts = {

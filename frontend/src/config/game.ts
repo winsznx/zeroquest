@@ -1,6 +1,6 @@
 // Game Contract Configuration - ZQGame
 
-export const gameContractAddress = '0xAAc3cDa25F27D94394C7127347C7486d288aB078';
+export const gameContractAddress = '0x1d882c29032Be317b49dF00eDbed3a6C4ae25B43';
 
 export const gameContractAbi = [
   {

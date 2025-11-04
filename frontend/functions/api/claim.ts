@@ -12,7 +12,7 @@ interface Env {
   BASE_RPC_URL: string;
 }
 
-const NFT_CONTRACT = "0x19A6B9654b463c79FAf2c474d539611b474b7e4e";
+const NFT_CONTRACT = "0x656bc95b9E2f713184129629C1c3dFbeB67aCc59";
 
 const ERC1155_ABI = [
   "function balanceOf(address account, uint256 id) view returns (uint256)"
