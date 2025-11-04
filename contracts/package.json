@@ -1,0 +1,22 @@
+{
+  "name": "zero-quest-contracts",
+  "version": "1.0.0",
+  "description": "Zero Quest Smart Contracts",
+  "scripts": {
+    "deploy": "hardhat run scripts/deploy.js --network base",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network baseSepolia",
+    "verify": "hardhat run scripts/verify.js --network base",
+    "verify:testnet": "hardhat run scripts/verify.js --network baseSepolia",
+    "fund": "hardhat run scripts/fundGame.js --network base",
+    "compile": "hardhat compile",
+    "test": "hardhat test"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.0",
+    "dotenv": "^16.4.0"
+  }
+}
