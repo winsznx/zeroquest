@@ -92,24 +92,53 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       const iface = new ethers.Interface(ERC1155_ABI);
       const data = iface.encodeFunctionData("balanceOf", [userAddress, 1]);
       
-      const rpcResponse = await fetch(BASE_RPC_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jsonrpc: "2.0",
-          method: "eth_call",
-          params: [{
-            to: NFT_CONTRACT,
-            data: data
-          }, "latest"],
-          id: 1
-        })
-      });
+      // Retry logic for rate limiting
+      let rpcResult;
+      let retries = 3;
+      let lastError;
       
-      const rpcResult = await rpcResponse.json();
+      while (retries > 0) {
+        try {
+          const rpcResponse = await fetch(BASE_RPC_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              jsonrpc: "2.0",
+              method: "eth_call",
+              params: [{
+                to: NFT_CONTRACT,
+                data: data
+              }, "latest"],
+              id: 1
+            })
+          });
+          
+          rpcResult = await rpcResponse.json();
+          
+          if (rpcResult.error) {
+            // If rate limited, retry with delay
+            if (rpcResult.error.message?.includes("rate limit") || rpcResult.error.code === -32005) {
+              if (retries > 1) {
+                await new Promise(resolve => setTimeout(resolve, 2000 * (4 - retries))); // Exponential backoff
+                retries--;
+                continue;
+              }
+            }
+            throw new Error(`RPC error: ${rpcResult.error.message || rpcResult.error}`);
+          }
+          
+          break; // Success
+        } catch (err: any) {
+          lastError = err;
+          retries--;
+          if (retries > 0) {
+            await new Promise(resolve => setTimeout(resolve, 2000 * (4 - retries)));
+          }
+        }
+      }
       
-      if (rpcResult.error) {
-        throw new Error(`RPC error: ${rpcResult.error.message || rpcResult.error}`);
+      if (!rpcResult && lastError) {
+        throw lastError;
       }
       
       if (!rpcResult.result || rpcResult.result === "0x") {
