@@ -74,41 +74,38 @@ export function useQuickAuth(): QuickAuthResult {
     setError(null);
 
     try {
-      // Use Sign In action
-      const result = await sdk.actions.signIn();
+      // Get user data from context (user is already authenticated in mini app)
+      const context = await sdk.context;
+      const user = context.user;
 
-      if (result) {
-        const context = await sdk.context;
-        const user = context.user;
-
+      if (user) {
         // Store user data
-        const newFid = user?.fid || null;
-        const newUsername = user?.username || null;
-        const newDisplayName = user?.displayName || null;
-        const newPfpUrl = user?.pfpUrl || null;
-
-        const newLocation = user?.location?.description || null;
+        const newFid = user.fid;
+        const newUsername = user.username || null;
+        const newDisplayName = user.displayName || null;
+        const newPfpUrl = user.pfpUrl || null;
+        const newLocation = user.location?.description || null;
 
         setFid(newFid);
         setUsername(newUsername);
         setDisplayName(newDisplayName);
         setPfpUrl(newPfpUrl);
-
         setLocation(newLocation);
-        setToken('authenticated'); // Use a placeholder token
+        setToken('authenticated');
 
         // Save to localStorage
-        if (newFid) localStorage.setItem('fc_fid', newFid.toString());
+        localStorage.setItem('fc_fid', newFid.toString());
         if (newUsername) localStorage.setItem('fc_username', newUsername);
         if (newDisplayName) localStorage.setItem('fc_display_name', newDisplayName);
         if (newPfpUrl) localStorage.setItem('fc_pfp_url', newPfpUrl);
-
         if (newLocation) localStorage.setItem('fc_location', newLocation);
         localStorage.setItem('fc_auth_token', 'authenticated');
+      } else {
+        setError('No user data available');
       }
     } catch (err: any) {
       setError(err.message || 'Authentication failed');
-      console.error('Sign in error:', err);
+      console.error('Auth error:', err);
     } finally {
       setIsLoading(false);
     }
