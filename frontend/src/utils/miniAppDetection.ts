@@ -11,9 +11,9 @@ export function isMiniApp(): boolean {
     // Check path
     if (url.pathname.startsWith('/miniapp')) return true;
 
-    // Check SDK availability and context
+    // Check SDK availability
     try {
-        return typeof sdk !== 'undefined' && sdk.context !== null;
+        return typeof sdk !== 'undefined';
     } catch {
         return false;
     }
@@ -33,9 +33,12 @@ export async function loadMiniAppSDK() {
 /**
  * Checks if a specific SDK feature is available
  */
-export function hasFeature(feature: string): boolean {
+export async function hasFeature(feature: string): Promise<boolean> {
     try {
-        return sdk.context.features?.includes(feature) || false;
+        const context = await sdk.context;
+        // ClientFeatures is an object with boolean properties
+        const features = context.features as Record<string, boolean> | undefined;
+        return features ? features[feature] === true : false;
     } catch {
         return false;
     }
@@ -44,9 +47,9 @@ export function hasFeature(feature: string): boolean {
 /**
  * Gets the current mini app context
  */
-export function getMiniAppContext() {
+export async function getMiniAppContext() {
     try {
-        return sdk.context;
+        return await sdk.context;
     } catch {
         return null;
     }

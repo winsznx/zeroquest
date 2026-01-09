@@ -2,7 +2,6 @@ import { useAccount, useReadContract, useDisconnect } from 'wagmi';
 import { gameContractAddress, gameContractAbi } from '../config/game';
 import { nftContractAddress, nftAbi } from '../config/nft';
 import { useQuickAuth } from '../hooks/useQuickAuth';
-import { sdk } from '@farcaster/miniapp-sdk';
 
 export const UserPage = () => {
   const { address, isConnected } = useAccount();
@@ -12,7 +11,6 @@ export const UserPage = () => {
     username,
     displayName,
     pfpUrl,
-    bio,
     location,
     isAuthenticated,
     isLoading,
@@ -104,12 +102,6 @@ export const UserPage = () => {
                     <p className="text-white">
                       <span className="text-gray-400">FID:</span>{" "}
                       <span className="font-mono text-purple-300">{fid}</span>
-                    </p>
-                  )}
-                  {bio && (
-                    <p className="text-white">
-                      <span className="text-gray-400">Bio:</span>{" "}
-                      <span className="text-sm text-gray-300">{bio}</span>
                     </p>
                   )}
                 </div>
