@@ -1,0 +1,18 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjEyMzQ1NiwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDEyMzQ1Njc4OTBhYmNkZWYxMjM0NTY3ODkwYWJjZGVmMTIzNDU2NzgifQ",
+    "payload": "eyJkb21haW4iOiJmYjhmMmQ2MC56ZXJvcXVlc3QucGFnZXMuZGV2In0",
+    "signature": "0xPLACEHOLDER_SIGNATURE_YOU_MUST_GENERATE_THIS_USING_CAST_FRAME_ADD_OR_NEYNAR_TOOLS"
+  },
+  "frame": {
+    "version": "1",
+    "name": "Zero Quest",
+    "iconUrl": "https://fb8f2d60.zeroquest.pages.dev/puzzle-icon.svg",
+    "homeUrl": "https://fb8f2d60.zeroquest.pages.dev",
+    "imageUrl": "https://fb8f2d60.zeroquest.pages.dev/og-image.png",
+    "buttonTitle": "Play Zero Quest",
+    "splashImageUrl": "https://fb8f2d60.zeroquest.pages.dev/og-image.png",
+    "splashBackgroundColor": "#1e3a8a",
+    "webhookUrl": "https://fb8f2d60.zeroquest.pages.dev/api/webhook"
+  }
+}
