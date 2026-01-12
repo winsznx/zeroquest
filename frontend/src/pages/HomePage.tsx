@@ -5,7 +5,7 @@ const HomePage = () => {
   const { address } = useAccount();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex flex-col items-center justify-center p-6 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex flex-col items-center justify-center p-6 pb-24 animate-fade-in leading-relaxed">
       <div className="text-center max-w-2xl">
         <div className="text-8xl mb-6">🧩</div>
         <h1 className="text-6xl font-bold text-white mb-4">Zero Quest</h1>
